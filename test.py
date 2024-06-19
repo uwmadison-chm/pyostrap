@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 BIOSTRAP_HOSTNAME = "api-beta.biostrap.com"
 
+
 def main():
     load_dotenv()
     api_key = os.getenv("BIOSTRAP_API_KEY")
@@ -13,6 +14,7 @@ def main():
     users_params = {"page": 1, "items_per_page": 1}
     response = bio_api.get("organizations/users", users_params)
     print(response)
+
 
 if __name__ == "__main__":
     main()
