@@ -12,12 +12,19 @@ from .models import Result
 class RestAdapter:
     def __init__(
         self,
-        hostname: str,
-        api_key: str = "",
+        api_key: str,
+        hostname: str = "api-beta.biostrap.com",
         ver: str = "v1",
         ssl_verify: bool = True,
         logger: logging.Logger = None,
     ):
+        """
+        :param api_key: string used for authentication
+        :param hostname: Normally, api-beta.biostrap.com
+        :param ver: always v1
+        :param ssl_verify: Normally set to True, but if having SSL/TLS cert validation issues, can turn off with False
+        :param logger: (optional) If your app has a logger, pass it in here
+        """
         self.url = f"https://{hostname}/{ver}/"
         self._api_key = api_key
         self._ssl_verify = ssl_verify
@@ -34,6 +41,7 @@ class RestAdapter:
         log_line_post = ", ".join(
             (log_line_pre, "success={}, status_code={}, message={}")
         )
+        # Log HTTP params and perform an HTTP request, catching and re-raising any exceptions
         try:
             self._logger.debug(msg=log_line_pre)
             response = requests.request(
@@ -47,7 +55,7 @@ class RestAdapter:
         except requests.exceptions.RequestException as e:
             self._logger.error(msg=(str(e)))
             raise BiostrapApiException("Request failed") from e
-
+        # Deserialize JSON output to Python object, or return failed Result on exception
         try:
             data_out = response.json()
         except (ValueError, JSONDecodeError) as e:
