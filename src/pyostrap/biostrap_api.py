@@ -15,6 +15,11 @@ class BiostrapApi:
     ):
         self._rest_adapter = RestAdapter(api_key, hostname, ver, ssl_verify, logger)
 
+    def get_user(self, user_id: str) -> User:
+        ep_params = {"user_id": user_id}
+        result = self._rest_adapter.get(endpoint="user", ep_params=ep_params)
+        return User(**result.data["data"])
+
     def get_users(self, page: int, items_per_page: int) -> Users:
         ep_params = {"page": page, "items_per_page": items_per_page}
         result = self._rest_adapter.get(
