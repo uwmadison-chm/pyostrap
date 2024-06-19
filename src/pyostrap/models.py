@@ -15,12 +15,22 @@ class Result:
         self.message = str(message)
         self.data = data if data else []
 
+
+@dataclass
+class Pagination:
+    available_pages: int
+    items_per_page: int
+    page: int
+    total_items: int
+
+
 @dataclass
 class Goals:
     steps: int
     sleep: int
     calories: int
     workout: int
+
 
 class User:
     def __init__(
@@ -42,3 +52,13 @@ class User:
         self.height = height
         self.weight = weight
         self.goals = Goals(**goals)
+
+
+class Users:
+    def __init__(self, users: List[User], data_left: bool):
+        self.users = users
+        self.data_left = data_left
+
+    def __iter__(self):
+        for user in self.users:
+            yield user
