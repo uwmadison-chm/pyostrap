@@ -1,4 +1,3 @@
-from datetime import date
 import os
 
 from dotenv import load_dotenv
@@ -10,6 +9,8 @@ def main():
     load_dotenv()
     api_key = os.getenv("BIOSTRAP_API_KEY")
     bio_api = BiostrapApi(api_key=api_key)
+    for user in bio_api.get_users(1, 3):
+        print(user.id, user.name)
 
 if __name__ == "__main__":
     main()

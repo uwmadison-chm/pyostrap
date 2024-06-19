@@ -70,6 +70,14 @@ class Users:
             yield user
 
 @dataclass
+class DeviceInfo:
+    last_data_uploaded_at_ts: int
+    last_updated_at_tz_offset_mins: int
+    type: str
+    battery_percentage: int = 0
+    last_battery_info_updated_at_ts: int = 0
+
+@dataclass
 class ActivityScore:
     avg: int
     goal: int

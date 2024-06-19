@@ -1,7 +1,8 @@
 from datetime import date
 import logging
+from typing import List
 
-from models import JobStatus, Pagination, Scores, User, Users
+from models import DeviceInfo, JobStatus, Pagination, Scores, User, Users
 from rest_adapter import RestAdapter
 
 
@@ -16,6 +17,14 @@ class BiostrapApi:
     ):
         self._rest_adapter = RestAdapter(api_key, hostname, ver, ssl_verify, logger)
 
+    # Device Information
+    def get_device_info(self, user_id: str) -> List[DeviceInfo]:
+        ep_params = {"user_id": user_id}
+        result = self._rest_adapter.get(
+            endpoint="device-info", ep_params=ep_params
+        )
+        return [DeviceInfo(**device) for device in result.data["devices"]]
+    
     # Organizations
     def get_users(self, page: int, items_per_page: int) -> Users:
         ep_params = {"page": page, "items_per_page": items_per_page}
