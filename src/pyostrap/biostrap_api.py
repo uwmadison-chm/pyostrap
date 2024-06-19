@@ -1,6 +1,7 @@
+from datetime import date
 import logging
 
-from models import JobStatus, Pagination, User, Users
+from models import JobStatus, Pagination, Scores, User, Users
 from rest_adapter import RestAdapter
 
 
@@ -24,13 +25,19 @@ class BiostrapApi:
         pagination = Pagination(**result.data["pagination"])
         user_list = [User(**raw_user) for raw_user in result.data["users"]]
         return Users(user_list, pagination.page < pagination.available_pages)
-    
+
     def get_job_status(self, job_id: str) -> JobStatus:
         ep_params = {"job_id": job_id}
         result = self._rest_adapter.get(
             endpoint="organizations/job-status", ep_params=ep_params
         )
         return JobStatus(**result.data["data"])
+
+    # Scores
+    def get_user_scores(self, day: date, user_id: str) -> Scores:
+        ep_params = {"date": day.isoformat(), "user_id": user_id}
+        result = self._rest_adapter.get(endpoint="scores", ep_params=ep_params)
+        return Scores(**result.data)
 
     # Users
     def get_user(self, user_id: str) -> User:

@@ -68,3 +68,32 @@ class Users:
     def __iter__(self):
         for user in self.users:
             yield user
+
+@dataclass
+class ActivityScore:
+    avg: int
+    goal: int
+    processing: bool
+    value: int
+
+@dataclass
+class RecoveryScore:
+    avg: int
+    message: str
+    processing: bool
+    stage: str
+    value: int
+
+@dataclass
+class SleepScore:
+    avg: int
+    duration_secs: int
+    goal: int
+    processing: bool
+    value: int
+
+class Scores:
+    def __init__(self, activity: Dict, recovery: Dict, sleep: Dict):
+        self.activity_score = ActivityScore(**activity)
+        self.recovery_score = RecoveryScore(**recovery)
+        self.sleep_score = SleepScore(**sleep)
