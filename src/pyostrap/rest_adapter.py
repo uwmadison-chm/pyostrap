@@ -5,8 +5,8 @@ from typing import Dict
 import requests
 import requests.packages
 
-from pyostrap.exceptions import BiostrapApiException
-from pyostrap.models import Result
+from exceptions import BiostrapApiException
+from models import Result
 
 
 class RestAdapter:
@@ -38,9 +38,6 @@ class RestAdapter:
         full_url = self.url + endpoint
         headers = {"Authorization": f"APIKey {self._api_key}"}
         log_line_pre = f"method={http_method}, url={full_url}, params={ep_params}"
-        log_line_post = ", ".join(
-            (log_line_pre, "success={}, status_code={}, message={}")
-        )
         # Log HTTP params and perform an HTTP request, catching and re-raising any exceptions
         try:
             self._logger.debug(msg=log_line_pre)
@@ -59,13 +56,14 @@ class RestAdapter:
         try:
             data_out = response.json()
         except (ValueError, JSONDecodeError) as e:
-            self._logger.error(msg=log_line_post.format(False, None, e))
+            log_line = (
+                f"{log_line_pre}, success={False}, status_code={None}, message={e}"
+            )
+            self._logger.error(log_line)
             raise BiostrapApiException("Bad JSON in response") from e
 
         is_success = 200 <= response.status_code <= 299
-        log_line = log_line_post.format(
-            is_success, response.status_code, response.reason
-        )
+        log_line = f"{log_line_pre}, success={is_success}, status_code={response.status_code}, message={response.reason}"
 
         if is_success:
             self._logger.debug(msg=log_line)
