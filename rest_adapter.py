@@ -11,7 +11,12 @@ from .models import Result
 
 class RestAdapter:
     def __init__(
-        self, hostname: str, api_key: str = "", ver: str = "v1", ssl_verify: bool = True, logger: logging.Logger = None
+        self,
+        hostname: str,
+        api_key: str = "",
+        ver: str = "v1",
+        ssl_verify: bool = True,
+        logger: logging.Logger = None,
     ):
         self.url = f"https://{hostname}/{ver}/"
         self._api_key = api_key
@@ -26,7 +31,9 @@ class RestAdapter:
         full_url = self.url + endpoint
         headers = {"Authorization": f"APIKey {self._api_key}"}
         log_line_pre = f"method={http_method}, url={full_url}, params={ep_params}"
-        log_line_post = ", ".join((log_line_pre, "success={}, status_code={}, message={}"))
+        log_line_post = ", ".join(
+            (log_line_pre, "success={}, status_code={}, message={}")
+        )
         try:
             self._logger.debug(msg=log_line_pre)
             response = requests.request(
@@ -48,8 +55,10 @@ class RestAdapter:
             raise BiostrapApiException("Bad JSON in response") from e
 
         is_success = 200 <= response.status_code <= 299
-        log_line = log_line_post.format(is_success, response.status_code, response.reason)
-        
+        log_line = log_line_post.format(
+            is_success, response.status_code, response.reason
+        )
+
         if is_success:
             self._logger.debug(msg=log_line)
             return Result(response.status_code, message=response.reason, data=data_out)
