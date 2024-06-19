@@ -1,8 +1,10 @@
+from json import JSONDecodeError
 import requests
 import requests.packages
-from typing import List, Dict
+from typing import Dict
 
 from .exceptions import BiostrapApiException
+from .models import Result
 
 class RestAdapter:
     def __init__(self, hostname: str, api_key: str='', ver: str='v1', ssl_verify: bool=True):
@@ -12,7 +14,7 @@ class RestAdapter:
         if not ssl_verify:
             requests.packages.urllib3.disable_warnings()
 
-    def _do(self, http_method: str, endpoint: str, ep_params: Dict=None, data: Dict=None):
+    def _do(self, http_method: str, endpoint: str, ep_params: Dict=None, data: Dict=None) -> Result:
         full_url = self.url + endpoint
         headers = {"Authorization": f"APIKey {self._api_key}"}
         try:
@@ -22,14 +24,18 @@ class RestAdapter:
         except requests.exceptions.RequestException as e:
             raise BiostrapApiException("Request failed") from e
         
-        data_out = response.json()
-        if response.status_code >= 200 and response.status_code <= 299:
-            return None
-        raise Exception(data_out["errors"])
+        try:
+            data_out = response.json()
+        except (ValueError, JSONDecodeError) as e:
+            raise BiostrapApiException("Bad JSON in response") from e
+        
+        if 200 <= response.status_code <= 299:
+            return Result(response.status_code, message=response.reason, data=data_out)
+        raise BiostrapApiException(f"{response.status_code}: {response.reason}")
     
-    def get(self, endpoint: str, ep_params: Dict=None) -> List[Dict]:
+    def get(self, endpoint: str, ep_params: Dict=None) -> Result:
         return self._do(http_method="GET", endpoint=endpoint, ep_params=ep_params)
     
-    def post(self, endpoint: str, ep_params: Dict=None, data: Dict=None):
+    def post(self, endpoint: str, ep_params: Dict=None, data: Dict=None) -> Result:
         return self._do(http_method="POST", endpoint=endpoint, ep_params=ep_params, data=data)
     
