@@ -15,6 +15,12 @@ class Result:
         self.message = str(message)
         self.data = data if data else []
 
+@dataclass
+class JobStatus:
+    job_id: str
+    job_type: str
+    latest_status: str
+    status_updated_at_ts: int
 
 @dataclass
 class Pagination:
