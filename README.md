@@ -9,4 +9,4 @@ Pyostrap is available on PyPI:
 $ pip install pyostrap
 ```
 
-Requests officially supports Python 3.12+.
+Pyostrap officially supports Python 3.12+.
