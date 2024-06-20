@@ -2,7 +2,16 @@ from datetime import date, datetime
 import logging
 from typing import List
 
-from pyostrap.models import DeviceInfo, JobStatus, LockStatus, Pagination, Scores, User, Users
+from pyostrap.models import (
+    CalorieDetailsGranular,
+    DeviceInfo,
+    JobStatus,
+    LockStatus,
+    Pagination,
+    Scores,
+    User,
+    Users,
+)
 from pyostrap.rest_adapter import RestAdapter
 from pyostrap.util import get_rfc3339_str
 
@@ -17,6 +26,23 @@ class BiostrapApi:
         logger: logging.Logger = None,
     ):
         self._rest_adapter = RestAdapter(api_key, hostname, ver, ssl_verify, logger)
+
+    # Calories
+    def get_calorie_details_granular(
+        self,
+        user_id: str,
+        date: date,
+        granularity: str,
+        user_timezone_offset_in_mins: int = 0,
+    ):
+        ep_params = {
+            "user_id": user_id,
+            "user_timezone_offset_in_mins": user_timezone_offset_in_mins,
+            "date": date.strftime("%Y-%m-%d"),
+            "granularity": granularity,
+        }
+        result = self._rest_adapter.get(endpoint="calorie/details", ep_params=ep_params)
+        return CalorieDetailsGranular(**result.data)
 
     # Device Information
     def get_device_info(self, user_id: str) -> List[DeviceInfo]:
@@ -74,7 +100,6 @@ class BiostrapApi:
             endpoint="organizations/user-device-lock", data=json_body
         )
         return LockStatus(**result.data)
-
 
     def get_users(self, page: int, items_per_page: int) -> Users:
         ep_params = {"page": page, "items_per_page": items_per_page}
