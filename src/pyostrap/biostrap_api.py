@@ -2,7 +2,7 @@ from datetime import date, datetime
 import logging
 from typing import List
 
-from pyostrap.models import DeviceInfo, JobStatus, Pagination, Scores, User, Users
+from pyostrap.models import DeviceInfo, JobStatus, LockStatus, Pagination, Scores, User, Users
 from pyostrap.rest_adapter import RestAdapter
 from pyostrap.util import get_rfc3339_str
 
@@ -55,6 +55,26 @@ class BiostrapApi:
             endpoint="organizations/job-status", ep_params=ep_params
         )
         return JobStatus(**result.data["data"])
+
+    def lock_or_unlock_device_to_user(
+        self,
+        user_id: str,
+        device_type: str,
+        device_mac_address_or_id_encoded: str,
+        operation: str,
+    ):
+        json_body = {
+            "user_id": user_id,
+            "device_type": device_type,
+            "device_mac_address_or_id_encoded": device_mac_address_or_id_encoded,
+            "operation": operation,
+        }
+
+        result = self._rest_adapter.post(
+            endpoint="organizations/user-device-lock", data=json_body
+        )
+        return LockStatus(**result.data)
+
 
     def get_users(self, page: int, items_per_page: int) -> Users:
         ep_params = {"page": page, "items_per_page": items_per_page}

@@ -112,3 +112,8 @@ class Scores:
         self.activity_score = ActivityScore(**activity)
         self.recovery_score = RecoveryScore(**recovery)
         self.sleep_score = SleepScore(**sleep)
+
+@dataclass
+class LockStatus:
+    status: str
+    status_message: str
