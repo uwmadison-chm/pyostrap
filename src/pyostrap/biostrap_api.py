@@ -46,11 +46,9 @@ class BiostrapApi:
     # Device Information
     def get_device_info(self, user_id: str) -> List[DeviceInfo]:
         ep_params = {"user_id": user_id}
-        result = self._rest_adapter.get(
-            endpoint="device-info", ep_params=ep_params
-        )
+        result = self._rest_adapter.get(endpoint="device-info", ep_params=ep_params)
         return [DeviceInfo(**device) for device in result.data["devices"]]
-    
+
     # Organizations
     def get_users(self, page: int, items_per_page: int) -> Users:
         ep_params = {"page": page, "items_per_page": items_per_page}

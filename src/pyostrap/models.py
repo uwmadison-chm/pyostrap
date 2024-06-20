@@ -15,12 +15,14 @@ class Result:
         self.message = str(message)
         self.data = data if data else []
 
+
 @dataclass
 class JobStatus:
     job_id: str
     job_type: str
     latest_status: str
     status_updated_at_ts: int
+
 
 @dataclass
 class Pagination:
@@ -69,6 +71,7 @@ class Users:
         for user in self.users:
             yield user
 
+
 @dataclass
 class DeviceInfo:
     last_data_uploaded_at_ts: int
@@ -77,12 +80,14 @@ class DeviceInfo:
     battery_percentage: int = 0
     last_battery_info_updated_at_ts: int = 0
 
+
 @dataclass
 class ActivityScore:
     avg: int
     goal: int
     processing: bool
     value: int
+
 
 @dataclass
 class RecoveryScore:
@@ -92,6 +97,7 @@ class RecoveryScore:
     stage: str
     value: int
 
+
 @dataclass
 class SleepScore:
     avg: int
@@ -99,6 +105,7 @@ class SleepScore:
     goal: int
     processing: bool
     value: int
+
 
 class Scores:
     def __init__(self, activity: Dict, recovery: Dict, sleep: Dict):
