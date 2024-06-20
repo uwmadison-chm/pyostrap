@@ -5,8 +5,8 @@ from typing import Dict
 import requests
 import requests.packages
 
-from exceptions import BiostrapApiException
-from models import Result
+from pyostrap.exceptions import BiostrapApiException
+from pyostrap.models import Result
 
 
 class RestAdapter:
