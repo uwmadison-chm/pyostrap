@@ -1,9 +1,10 @@
-from datetime import date
+from datetime import date, datetime
 import logging
 from typing import List
 
 from models import DeviceInfo, JobStatus, Pagination, Scores, User, Users
 from rest_adapter import RestAdapter
+from util import get_rfc3339_str
 
 
 class BiostrapApi:
@@ -16,6 +17,31 @@ class BiostrapApi:
         logger: logging.Logger = None,
     ):
         self._rest_adapter = RestAdapter(api_key, hostname, ver, ssl_verify, logger)
+
+    # Organizations
+    def download_raw_data(
+        self,
+        target_email: str,
+        start_time: datetime,
+        end_time: datetime,
+        user_ids: List[str],
+        data_to_download: List[str],
+        output_file_formats: List[str],
+        anonymize_ids: bool = False,
+    ) -> str:
+        json_body = {
+            "target_email": target_email,
+            "start_time": get_rfc3339_str(start_time),
+            "end_time": get_rfc3339_str(end_time),
+            "user_ids": user_ids,
+            "data_to_download": data_to_download,
+            "output_file_formats": output_file_formats,
+            "anonymize_ids": anonymize_ids,
+        }
+        result = self._rest_adapter.post(
+            endpoint="organizations/data-download/raw/send-request", data=json_body
+        )
+        return result.data["job_id"]
 
     # Device Information
     def get_device_info(self, user_id: str) -> List[DeviceInfo]:
