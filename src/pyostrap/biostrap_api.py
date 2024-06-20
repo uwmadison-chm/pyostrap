@@ -2,9 +2,9 @@ from datetime import date, datetime
 import logging
 from typing import List
 
-from models import DeviceInfo, JobStatus, Pagination, Scores, User, Users
-from rest_adapter import RestAdapter
-from util import get_rfc3339_str
+from pyostrap.models import DeviceInfo, JobStatus, Pagination, Scores, User, Users
+from pyostrap.rest_adapter import RestAdapter
+from pyostrap.util import get_rfc3339_str
 
 
 class BiostrapApi:
