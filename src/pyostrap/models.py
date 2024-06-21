@@ -113,10 +113,12 @@ class Scores:
         self.recovery_score = RecoveryScore(**recovery)
         self.sleep_score = SleepScore(**sleep)
 
+
 @dataclass
 class LockStatus:
     status: str
     status_message: str
+
 
 class Timepoint:
     def __init__(self, time: str, date: str, value: float):
@@ -124,8 +126,17 @@ class Timepoint:
         self.date = None if not self.time else self.time.date()
         self.value = value
 
+
 class Metric:
-    def __init__(self, type: str, name: str, value: float, unit: str, value_is_an_avg: bool, timeseries: List[Dict]):
+    def __init__(
+        self,
+        type: str,
+        name: str,
+        value: float,
+        unit: str,
+        value_is_an_avg: bool,
+        timeseries: List[Dict],
+    ):
         self.type = type
         self.name = name
         self.value = value
@@ -133,8 +144,16 @@ class Metric:
         self.value_is_an_avg = value_is_an_avg
         self.timeseries = [Timepoint(**timepoint) for timepoint in timeseries]
 
+
 class CalorieDetailsGranular:
-    def __init__(self, date: str, granularity: str, daily_calories_goal: int, calories_goal_achieved_percentage: int, metrics: List[Dict]):
+    def __init__(
+        self,
+        date: str,
+        granularity: str,
+        daily_calories_goal: int,
+        calories_goal_achieved_percentage: int,
+        metrics: List[Dict],
+    ):
         self.date = datetime.strptime(date, "%Y-%m-%d").date()
         self.granularity = granularity
         self.daily_calories_goal = daily_calories_goal
