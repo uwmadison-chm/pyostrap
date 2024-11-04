@@ -36,7 +36,7 @@ class BiostrapApi:
             raise ValueError("Limit must be between 1 and 50, inclusive")
 
         ep_params = {
-            "last-timestamp": get_rfc3339_str(last_timestamp),
+            "last-timestamp": last_timestamp.time() * 1000,
             "limit": limit,
             "user_id": user_id,
         }
