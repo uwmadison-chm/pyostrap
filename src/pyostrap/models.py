@@ -159,3 +159,34 @@ class CalorieDetailsGranular:
         self.daily_calories_goal = daily_calories_goal
         self.calories_goal_achieved_percentage = calories_goal_achieved_percentage
         self.metrics = [Metric(**metric) for metric in metrics]
+
+
+@dataclass
+class AdditionalBiometrics:
+    ae: int
+    arterial_health_score: int
+    pe: int
+
+
+class Biometrics:
+    def __init__(
+        self,
+        additional_biometrics: Dict,
+        bpm: int,
+        brpm: int,
+        hrv: int,
+        resting_bpm: int,
+        resting_hrv: int,
+        spo2: int,
+        state: str,
+        timestamp: str,
+    ):
+        self.additional_biometrics = AdditionalBiometrics(**additional_biometrics)
+        self.bpm = bpm
+        self.brpm = brpm
+        self.hrv = hrv
+        self.resting_bpm = resting_bpm
+        self.resting_hrv = resting_hrv
+        self.spo2 = spo2
+        self.state = state
+        self.timestamp = timestamp

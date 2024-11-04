@@ -3,6 +3,7 @@ import logging
 from typing import List
 
 from pyostrap.models import (
+    Biometrics,
     CalorieDetailsGranular,
     DeviceInfo,
     JobStatus,
@@ -27,6 +28,23 @@ class BiostrapApi:
     ):
         self._rest_adapter = RestAdapter(api_key, hostname, ver, ssl_verify, logger)
 
+    # Biometrics
+    def get_user_biometrics(
+        self, last_timestamp: datetime, limit: int, user_id: str
+    ) -> Biometrics:
+        if limit < 1 or limit > 50:
+            raise ValueError("Limit must be between 1 and 50, inclusive")
+
+        ep_params = {
+            "last-timestamp": get_rfc3339_str(last_timestamp),
+            "limit": limit,
+            "user_id": user_id,
+        }
+        result = self._rest_adapter.get(endpoint="biometrics", ep_params=ep_params)
+        if not result.data:
+            return None
+        return Biometrics(**result.data)
+
     # Calories
     def get_calorie_details_granular(
         self,
@@ -34,7 +52,7 @@ class BiostrapApi:
         date: date,
         granularity: str,
         user_timezone_offset_in_mins: int = 0,
-    ):
+    ) -> CalorieDetailsGranular:
         ep_params = {
             "user_id": user_id,
             "user_timezone_offset_in_mins": user_timezone_offset_in_mins,
