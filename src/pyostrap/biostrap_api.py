@@ -114,6 +114,8 @@ class BiostrapApi:
     def get_user_scores(self, day: date, user_id: str) -> Scores:
         ep_params = {"date": day.isoformat(), "user_id": user_id}
         result = self._rest_adapter.get(endpoint="scores", ep_params=ep_params)
+        if not result.data:
+            return None
         return Scores(**result.data)
 
     # Users
