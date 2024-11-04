@@ -43,7 +43,7 @@ class BiostrapApi:
         result = self._rest_adapter.get(endpoint="biometrics", ep_params=ep_params)
         if not result.data["data"]:
             return None
-        return Biometrics(**result.data["data"])
+        return Biometrics(**(result.data["data"]))
 
     # Calories
     def get_calorie_details_granular(
