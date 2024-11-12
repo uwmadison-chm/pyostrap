@@ -1,4 +1,3 @@
-from json import JSONDecodeError
 import logging
 from typing import Dict
 
@@ -6,7 +5,6 @@ import requests
 import requests.packages
 
 from pyostrap.exceptions import BiostrapApiException
-from pyostrap.models import Result
 
 
 class RestAdapter:
@@ -34,7 +32,7 @@ class RestAdapter:
 
     def _do(
         self, http_method: str, endpoint: str, ep_params: Dict = None, data: Dict = None
-    ) -> Result:
+    ) -> str:
         full_url = self.url + endpoint
         headers = {"Authorization": f"APIKey {self._api_key}"}
         log_line_pre = f"method={http_method}, url={full_url}, params={ep_params}"
@@ -52,29 +50,20 @@ class RestAdapter:
         except requests.exceptions.RequestException as e:
             self._logger.error(msg=(str(e)))
             raise BiostrapApiException("Request failed") from e
-        # Deserialize JSON output to Python object, or return failed Result on exception
-        try:
-            data_out = response.json()
-        except (ValueError, JSONDecodeError) as e:
-            log_line = (
-                f"{log_line_pre}, success={False}, status_code={None}, message={e}"
-            )
-            self._logger.error(log_line)
-            raise BiostrapApiException("Bad JSON in response") from e
-
+        
         is_success = 200 <= response.status_code <= 299
         log_line = f"{log_line_pre}, success={is_success}, status_code={response.status_code}, message={response.reason}"
 
         if is_success:
             self._logger.debug(msg=log_line)
-            return Result(response.status_code, message=response.reason, data=data_out)
+            return response.text
         self._logger.error(msg=log_line)
         raise BiostrapApiException(f"{response.status_code}: {response.reason}")
 
-    def get(self, endpoint: str, ep_params: Dict = None) -> Result:
+    def get(self, endpoint: str, ep_params: Dict = None) -> str:
         return self._do(http_method="GET", endpoint=endpoint, ep_params=ep_params)
 
-    def post(self, endpoint: str, ep_params: Dict = None, data: Dict = None) -> Result:
+    def post(self, endpoint: str, ep_params: Dict = None, data: Dict = None) -> str:
         return self._do(
             http_method="POST", endpoint=endpoint, ep_params=ep_params, data=data
         )
