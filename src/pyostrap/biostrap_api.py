@@ -1,9 +1,64 @@
+from dataclasses import dataclass
 from datetime import date, datetime
+from enum import Enum
+import json
 import logging
-from typing import List
+from typing import Dict, List
 
 from pyostrap.rest_adapter import RestAdapter
 from pyostrap.util import get_rfc3339_str
+
+
+class Granularity(Enum):
+    DAY = "day"
+    WEEK = "week"
+    MONTH = "month"
+    YEAR = "year"
+    
+@dataclass
+class Pagination:
+    available_pages: int
+    items_per_page: int
+    page: int
+    total_items: int
+
+@dataclass
+class Goals:
+    steps: int
+    sleep: int
+    calories: int
+    workout: int
+
+
+class User:
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        email: str,
+        birthday: str,
+        gender: str,
+        height: float,
+        weight: float,
+        goals: Dict,
+    ):
+        self.id = id
+        self.name = name
+        self.email = email
+        self.birthday = datetime.strptime(birthday, "%Y-%m-%d").date()
+        self.gender = gender
+        self.height = height
+        self.weight = weight
+        self.goals = Goals(**goals)
+
+class Users:
+    def __init__(self, users: List[User], data_left: bool):
+        self.users = users
+        self.data_left = data_left
+
+    def __iter__(self):
+        for user in self.users:
+            yield user
 
 
 class BiostrapApi:
@@ -101,22 +156,36 @@ class BiostrapApi:
             endpoint="organizations/user-device-lock", data=json_body
         )
 
-    def get_users(self, page: int, items_per_page: int) -> str:
+    def get_users(self, page: int, items_per_page: int) -> Users:
         ep_params = {"page": page, "items_per_page": items_per_page}
-        return self._rest_adapter.get(
+        raw_json = self._rest_adapter.get(
             endpoint="organizations/users", ep_params=ep_params
         )
+        data = json.loads(raw_json)
+        pagination = Pagination(**data["pagination"])
+        user_list = [User(**raw_user) for raw_user in data["users"]]
+        return Users(user_list, pagination.page < pagination.available_pages)
 
     # Scores
     def get_user_scores(self, day: date, user_id: str) -> str:
         ep_params = {"date": day.isoformat(), "user_id": user_id}
         return self._rest_adapter.get(endpoint="scores", ep_params=ep_params)
-    
+
     # Sleep
     def get_user_sleep_stats(self, day: date, user_id: str) -> str:
         ep_params = {"date": day.isoformat(), "user_id": user_id}
         return self._rest_adapter.get(endpoint="sleep", ep_params=ep_params)
 
+    # Steps
+    def get_user_step_details_with_granularity(
+        self, day: date, user_id: str, granularity: Granularity = Granularity.DAY
+    ) -> str:
+        ep_params = {
+            "date": day.isoformat(),
+            "user_id": user_id,
+            "granularity": granularity.value,
+        }
+        return self._rest_adapter.get(endpoint="step/details", ep_params=ep_params)
 
     # Users
     def get_user(self, user_id: str) -> str:
