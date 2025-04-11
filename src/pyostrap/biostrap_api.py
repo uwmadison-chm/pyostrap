@@ -1,11 +1,11 @@
+import json
+import logging
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
-import json
-import logging
 from typing import Dict, List
 
-from pyostrap.rest_adapter import RestAdapter
+from pyostrap.httpx_adapter import HttpxClient
 from pyostrap.util import get_rfc3339_str
 
 
@@ -14,13 +14,15 @@ class Granularity(Enum):
     WEEK = "week"
     MONTH = "month"
     YEAR = "year"
-    
+
+
 @dataclass
 class Pagination:
     available_pages: int
     items_per_page: int
     page: int
     total_items: int
+
 
 @dataclass
 class Goals:
@@ -51,6 +53,7 @@ class User:
         self.weight = weight
         self.goals = Goals(**goals)
 
+
 class Users:
     def __init__(self, users: List[User], data_left: bool):
         self.users = users
@@ -70,7 +73,7 @@ class BiostrapApi:
         ssl_verify: bool = True,
         logger: logging.Logger = None,
     ):
-        self._rest_adapter = RestAdapter(api_key, hostname, ver, ssl_verify, logger)
+        self._httpx_client = HttpxClient(api_key, hostname, ver, ssl_verify, logger)
 
     # Biometrics
     def get_user_biometrics(
@@ -84,7 +87,7 @@ class BiostrapApi:
             "limit": limit,
             "user_id": user_id,
         }
-        return self._rest_adapter.get(endpoint="biometrics", ep_params=ep_params)
+        return self._httpx_client.get(endpoint="biometrics", ep_params=ep_params)
 
     # Calories
     def get_calorie_details_granular(
@@ -100,12 +103,12 @@ class BiostrapApi:
             "date": date.strftime("%Y-%m-%d"),
             "granularity": granularity,
         }
-        return self._rest_adapter.get(endpoint="calorie/details", ep_params=ep_params)
+        return self._httpx_client.get(endpoint="calorie/details", ep_params=ep_params)
 
     # Device Information
     def get_device_info(self, user_id: str) -> str:
         ep_params = {"user_id": user_id}
-        result = self._rest_adapter.get(endpoint="device-info", ep_params=ep_params)
+        result = self._httpx_client.get(endpoint="device-info", ep_params=ep_params)
         return result
 
     # Organizations
@@ -128,13 +131,13 @@ class BiostrapApi:
             "output_file_formats": output_file_formats,
             "anonymize_ids": anonymize_ids,
         }
-        return self._rest_adapter.post(
+        return self._httpx_client.post(
             endpoint="organizations/data-download/raw/send-request", data=json_body
         )
 
     def get_job_status(self, job_id: str) -> str:
         ep_params = {"job_id": job_id}
-        return self._rest_adapter.get(
+        return self._httpx_client.get(
             endpoint="organizations/job-status", ep_params=ep_params
         )
 
@@ -152,13 +155,13 @@ class BiostrapApi:
             "operation": operation,
         }
 
-        return self._rest_adapter.post(
+        return self._httpx_client.post(
             endpoint="organizations/user-device-lock", data=json_body
         )
 
     def get_users(self, page: int, items_per_page: int) -> Users:
         ep_params = {"page": page, "items_per_page": items_per_page}
-        raw_json = self._rest_adapter.get(
+        raw_json = self._httpx_client.get(
             endpoint="organizations/users", ep_params=ep_params
         )
         data = json.loads(raw_json)
@@ -169,12 +172,12 @@ class BiostrapApi:
     # Scores
     def get_user_scores(self, day: date, user_id: str) -> str:
         ep_params = {"date": day.isoformat(), "user_id": user_id}
-        return self._rest_adapter.get(endpoint="scores", ep_params=ep_params)
+        return self._httpx_client.get(endpoint="scores", ep_params=ep_params)
 
     # Sleep
     def get_user_sleep_stats(self, day: date, user_id: str) -> str:
         ep_params = {"date": day.isoformat(), "user_id": user_id}
-        return self._rest_adapter.get(endpoint="sleep", ep_params=ep_params)
+        return self._httpx_client.get(endpoint="sleep", ep_params=ep_params)
 
     # Steps
     def get_user_step_details_with_granularity(
@@ -185,9 +188,9 @@ class BiostrapApi:
             "user_id": user_id,
             "granularity": granularity.value,
         }
-        return self._rest_adapter.get(endpoint="step/details", ep_params=ep_params)
+        return self._httpx_client.get(endpoint="step/details", ep_params=ep_params)
 
     # Users
     def get_user(self, user_id: str) -> str:
         ep_params = {"user_id": user_id}
-        return self._rest_adapter.get(endpoint="user", ep_params=ep_params)
+        return self._httpx_client.get(endpoint="user", ep_params=ep_params)
