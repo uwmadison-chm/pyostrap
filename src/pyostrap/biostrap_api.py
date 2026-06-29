@@ -68,7 +68,7 @@ class BiostrapApi:
     def __init__(
         self,
         api_key: str,
-        hostname: str = "api-beta.biostrap.com",
+        hostname: str = "api.sensorbio.com",
         ver: str = "v1",
         ssl_verify: bool = True,
         logger: logging.Logger = None,

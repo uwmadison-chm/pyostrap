@@ -67,8 +67,8 @@ class HttpxClient:
             )
         except httpx.HTTPError as e:
             log_error = (
-                f"{log_line}; message={response.reason_phrase};"
-                f" {response.json()["errors"][0]["title"]} "
+                f"{log_line_pre}; message={response.reason_phrase};"
+                f" {response.json()['errors'][0]['title']} "
             )
 
             self._logger.error(msg=f"{log_error}")
