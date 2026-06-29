@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyostrap"
-version = "2025.04.11.0"
+version = "2026.06.29.0"
 authors = [
     { name="Nicholas Vanhaute", email="nvanhaute@wisc.edu" },
     { name="Stuti Shrivastava", email="sshrivastav6@wisc.edu" },
