@@ -437,7 +437,7 @@ wheels = [
 
 [[package]]
 name = "pyostrap"
-version = "2025.4.11.0"
+version = "2026.6.29.0"
 source = { editable = "." }
 dependencies = [
     { name = "anyio" },
