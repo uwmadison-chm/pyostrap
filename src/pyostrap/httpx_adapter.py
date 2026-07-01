@@ -61,6 +61,7 @@ class HttpxClient:
                 params=ep_params,
             )
             response = self.client.send(request)
+            response.raise_for_status()
             log_line = (
                 f"{log_line_pre}, success={response.is_success}, "
                 f"status_code={response.status_code}"
